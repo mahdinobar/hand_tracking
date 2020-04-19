@@ -105,7 +105,7 @@ class HandTracker():
         self.interp_joint.invoke()
 
         joints = self.interp_joint.get_tensor(self.out_idx_joint)
-        return joints.reshape(-1,2)
+        return joints.reshape(-1,3)
 
     def detect_hand(self, img_norm):
         assert -1 <= img_norm.min() and img_norm.max() <= 1,\
@@ -183,8 +183,8 @@ class HandTracker():
             self._im_normalize(img_pad), Mtr, (256,256)
         )
 
-        joints = self.predict_joints(img_landmark)
-
+        joints_full_estimation = self.predict_joints(img_landmark)
+        joints = joints_full_estimation[:,:2]
         # adding the [0,0,1] row to make the matrix square
         Mtr = self._pad1(Mtr.T).T
         Mtr[2,:2] = 0
@@ -197,4 +197,4 @@ class HandTracker():
         kp_orig -= pad[::-1]
         box_orig -= pad[::-1]
 
-        return kp_orig, box_orig
+        return kp_orig, box_orig, joints_full_estimation

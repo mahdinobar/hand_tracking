@@ -3,7 +3,7 @@ from hand_tracker import HandTracker
 
 WINDOW = "Hand Tracking"
 PALM_MODEL_PATH = "./palm_detection_without_custom_op.tflite"
-LANDMARK_MODEL_PATH = "./hand_landmark.tflite"
+LANDMARK_MODEL_PATH = "./hand_landmark_3d.tflite"
 ANCHORS_PATH = "./anchors.csv"
 
 POINT_COLOR = (0, 255, 0)
@@ -11,12 +11,14 @@ CONNECTION_COLOR = (255, 0, 0)
 THICKNESS = 2
 
 cv2.namedWindow(WINDOW)
-capture = cv2.VideoCapture(0)
+# capture = cv2.VideoCapture(0)
 
-if capture.isOpened():
-    hasFrame, frame = capture.read()
-else:
-    hasFrame = False
+# if capture.isOpened():
+#     hasFrame, frame = capture.read()
+# else:
+#     hasFrame = False
+hasFrame = True
+frame = cv2.imread('/home/mahdi/HVR/hvr/hand_pcl_iPhone/Tom_set_3/60cm_withoutRule/Image_60cm_withoutRule_color.png')
 
 #        8   12  16  20
 #        |   |   |   |
@@ -49,20 +51,21 @@ detector = HandTracker(
 
 while hasFrame:
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    points, _ = detector(image)
+    points, _, joints_full_estimation = detector(image)
     if points is not None:
         for point in points:
             x, y = point
             cv2.circle(frame, (int(x), int(y)), THICKNESS * 2, POINT_COLOR, THICKNESS)
+            print(x,y)
         for connection in connections:
             x0, y0 = points[connection[0]]
             x1, y1 = points[connection[1]]
             cv2.line(frame, (int(x0), int(y0)), (int(x1), int(y1)), CONNECTION_COLOR, THICKNESS)
     cv2.imshow(WINDOW, frame)
-    hasFrame, frame = capture.read()
-    key = cv2.waitKey(20)
+    # hasFrame, frame = capture.read()
+    key = cv2.waitKey(0)
     if key == 27:
         break
 
-capture.release()
+# capture.release()
 cv2.destroyAllWindows()
