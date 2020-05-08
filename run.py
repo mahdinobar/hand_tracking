@@ -18,7 +18,7 @@ cv2.namedWindow(WINDOW)
 # else:
 #     hasFrame = False
 hasFrame = True
-frame = cv2.imread('/home/mahdi/HVR/hvr/hand_pcl_iPhone/Tom_set_3/60cm_withoutRule/Image_60cm_withoutRule_color.png')
+frame = cv2.imread('/home/mahdi/HVR/hvr/data/iPad/set_4/iPad_2_color_1')
 
 #        8   12  16  20
 #        |   |   |   |
@@ -53,9 +53,19 @@ while hasFrame:
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     points, _, joints_full_estimation = detector(image)
     if points is not None:
+        k = 0
         for point in points:
             x, y = point
-            cv2.circle(frame, (int(x), int(y)), THICKNESS * 2, POINT_COLOR, THICKNESS)
+            cv2.circle(frame, (int(x), int(y)), THICKNESS * 2, POINT_COLOR, THICKNESS*5)
+            TEXT_FACE = cv2.FONT_HERSHEY_DUPLEX
+            TEXT_SCALE = 0.5
+            TEXT_THICKNESS = 1
+            TEXT = str(k)
+            text_size, _ = cv2.getTextSize(TEXT, TEXT_FACE, TEXT_SCALE, TEXT_THICKNESS)
+            text_origin = (int(x - text_size[0] / 2), int(y + text_size[1] / 2))
+            cv2.putText(frame, TEXT, text_origin, TEXT_FACE, TEXT_SCALE, (0, 0, 0), TEXT_THICKNESS, cv2.LINE_AA)
+            k += 1
+
             print(x,y)
         for connection in connections:
             x0, y0 = points[connection[0]]
@@ -63,7 +73,8 @@ while hasFrame:
             cv2.line(frame, (int(x0), int(y0)), (int(x1), int(y1)), CONNECTION_COLOR, THICKNESS)
     cv2.imshow(WINDOW, frame)
     # hasFrame, frame = capture.read()
-    key = cv2.waitKey(0)
+    key = cv2.waitKey(5000)
+    # hasFrame = False
     if key == 27:
         break
 
